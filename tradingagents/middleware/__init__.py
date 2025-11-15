@@ -22,6 +22,24 @@ from tradingagents.middleware.human_approval import (
 
 from tradingagents.middleware.conversation_summary import ConversationSummaryMiddleware
 
+from tradingagents.middleware.content_blocks import (
+    ContentBlocksMiddleware,
+    ContentBlockType
+)
+
+from tradingagents.middleware.reasoning_handler import (
+    ReasoningHandler,
+    ReasoningModelType,
+    ReasoningTrace
+)
+
+from tradingagents.middleware.citations_handler import (
+    CitationsHandler,
+    CitationType,
+    Citation,
+    CitedAnswer
+)
+
 __all__ = [
     # Base
     "BaseMiddleware",
@@ -40,6 +58,21 @@ __all__ = [
 
     # Conversation Summary
     "ConversationSummaryMiddleware",
+
+    # Content Blocks
+    "ContentBlocksMiddleware",
+    "ContentBlockType",
+
+    # Reasoning
+    "ReasoningHandler",
+    "ReasoningModelType",
+    "ReasoningTrace",
+
+    # Citations
+    "CitationsHandler",
+    "CitationType",
+    "Citation",
+    "CitedAnswer",
 ]
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
