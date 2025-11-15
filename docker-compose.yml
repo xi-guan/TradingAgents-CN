@@ -212,27 +212,6 @@ services:
     profiles:
       - management
 
-  # pgAdmin PostgreSQL 管理界面（可选）
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: tradingagents-pgadmin
-    restart: unless-stopped
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@tradingagents.com
-      PGADMIN_DEFAULT_PASSWORD: tradingagents123
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - tradingagents-network
-    depends_on:
-      timescaledb:
-        condition: service_healthy
-    profiles:
-      - management
-
 # 数据卷定义
 volumes:
   timescaledb_data:
@@ -244,9 +223,6 @@ volumes:
   redis_data:
     driver: local
     name: tradingagents_redis_data
-  pgadmin_data:
-    driver: local
-    name: tradingagents_pgadmin_data
 
 # 网络定义
 networks:
