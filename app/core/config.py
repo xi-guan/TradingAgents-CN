@@ -27,32 +27,30 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = Field(default_factory=lambda: ["*"])
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["*"])
 
-    # MongoDB配置
-    MONGODB_HOST: str = Field(default="localhost")
-    MONGODB_PORT: int = Field(default=27017)
-    MONGODB_USERNAME: str = Field(default="")
-    MONGODB_PASSWORD: str = Field(default="")
-    MONGODB_DATABASE: str = Field(default="tradingagents")
-    MONGODB_AUTH_SOURCE: str = Field(default="admin")
-    MONGO_MAX_CONNECTIONS: int = Field(default=100)
-    MONGO_MIN_CONNECTIONS: int = Field(default=10)
-    # MongoDB超时参数（毫秒）- 用于处理大量历史数据
-    MONGO_CONNECT_TIMEOUT_MS: int = Field(default=30000)  # 连接超时：30秒（原为10秒）
-    MONGO_SOCKET_TIMEOUT_MS: int = Field(default=60000)   # 套接字超时：60秒（原为20秒）
-    MONGO_SERVER_SELECTION_TIMEOUT_MS: int = Field(default=5000)  # 服务器选择超时：5秒
+    # PostgreSQL/TimescaleDB 配置
+    POSTGRES_HOST: str = Field(default="localhost")
+    POSTGRES_PORT: int = Field(default=5432)
+    POSTGRES_USER: str = Field(default="tradingagents")
+    POSTGRES_PASSWORD: str = Field(default="your_password_here")
+    POSTGRES_DB: str = Field(default="tradingagents")
+    POSTGRES_MAX_CONNECTIONS: int = Field(default=100)
+    POSTGRES_MIN_CONNECTIONS: int = Field(default=10)
 
     @property
-    def MONGO_URI(self) -> str:
-        """构建MongoDB URI"""
-        if self.MONGODB_USERNAME and self.MONGODB_PASSWORD:
-            return f"mongodb://{self.MONGODB_USERNAME}:{self.MONGODB_PASSWORD}@{self.MONGODB_HOST}:{self.MONGODB_PORT}/{self.MONGODB_DATABASE}?authSource={self.MONGODB_AUTH_SOURCE}"
-        else:
-            return f"mongodb://{self.MONGODB_HOST}:{self.MONGODB_PORT}/{self.MONGODB_DATABASE}"
+    def POSTGRES_URI(self) -> str:
+        """构建 PostgreSQL URI"""
+        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     @property
-    def MONGO_DB(self) -> str:
-        """获取数据库名称"""
-        return self.MONGODB_DATABASE
+    def POSTGRES_ASYNC_URI(self) -> str:
+        """构建 PostgreSQL 异步 URI (asyncpg)"""
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+    # Qdrant 向量数据库配置
+    QDRANT_HOST: str = Field(default="localhost")
+    QDRANT_PORT: int = Field(default=6333)
+    QDRANT_API_KEY: str = Field(default="")  # 如果使用 Qdrant Cloud，需要设置
+    QDRANT_GRPC_PORT: int = Field(default=6334)  # gRPC 端口（可选）
 
     # Redis配置
     REDIS_HOST: str = Field(default="localhost")

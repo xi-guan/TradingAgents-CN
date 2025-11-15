@@ -31,9 +31,16 @@ services:
       TRADINGAGENTS_LOG_DIR: "/app/logs"
       TRADINGAGENTS_LOG_FILE: "/app/logs/tradingagents.log"
       # Docker专用数据库配置
-      TRADINGAGENTS_MONGODB_URL: mongodb://admin:tradingagents123@mongodb:27017/tradingagents?authSource=admin
-      TRADINGAGENTS_REDIS_URL: redis://:tradingagents123@redis:6379
-      TRADINGAGENTS_CACHE_TYPE: redis
+      POSTGRES_HOST: timescaledb
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: tradingagents
+      POSTGRES_PASSWORD: tradingagents123
+      POSTGRES_DB: tradingagents
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: tradingagents123
       # Docker环境标识
       DOCKER_CONTAINER: "true"
       # API配置
@@ -42,7 +49,9 @@ services:
       # CORS配置
       CORS_ORIGINS: "http://localhost:3000,http://localhost:8080,http://localhost:5173"
     depends_on:
-      mongodb:
+      timescaledb:
+        condition: service_healthy
+      qdrant:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -92,29 +101,62 @@ services:
         max-size: "100m"
         max-file: "3"
 
-  # MongoDB 数据库服务
-  mongodb:
-    image: mongo:4.4
-    container_name: tradingagents-mongodb
+  # TimescaleDB 时序数据库服务
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: tradingagents-timescaledb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "5432:5432"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: tradingagents123
-      MONGO_INITDB_DATABASE: tradingagents
+      POSTGRES_USER: tradingagents
+      POSTGRES_PASSWORD: tradingagents123
+      POSTGRES_DB: tradingagents
+      PGDATA: /var/lib/postgresql/data/pgdata
       TZ: "Asia/Shanghai"
+      # TimescaleDB 性能优化
+      TS_TUNE_MEMORY: 4GB
+      TS_TUNE_NUM_CPUS: 4
     volumes:
-      - mongodb_data:/data/db
-      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - timescaledb_data:/var/lib/postgresql/data
+      - ./database/timescaledb/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./database/timescaledb/schema.sql:/docker-entrypoint-initdb.d/02_schema.sql
     networks:
       - tradingagents-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      test: ["CMD-SHELL", "pg_isready -U tradingagents -d tradingagents"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    shm_size: 1g
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  # Qdrant 向量数据库服务
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: tradingagents-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"  # HTTP API
+      - "6334:6334"  # gRPC
+    environment:
+      QDRANT__LOG_LEVEL: INFO
+      TZ: "Asia/Shanghai"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - tradingagents-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6333/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -170,35 +212,41 @@ services:
     profiles:
       - management
 
-  # Mongo Express 管理界面（可选）
-  mongo-express:
-    image: mongo-express:latest
-    container_name: tradingagents-mongo-express
+  # pgAdmin PostgreSQL 管理界面（可选）
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tradingagents-pgadmin
     restart: unless-stopped
     ports:
-      - "8082:8081"
+      - "5050:80"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: tradingagents123
-      ME_CONFIG_MONGODB_URL: mongodb://admin:tradingagents123@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: tradingagents123
+      PGADMIN_DEFAULT_EMAIL: admin@tradingagents.com
+      PGADMIN_DEFAULT_PASSWORD: tradingagents123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - tradingagents-network
     depends_on:
-      mongodb:
+      timescaledb:
         condition: service_healthy
     profiles:
       - management
 
 # 数据卷定义
 volumes:
-  mongodb_data:
+  timescaledb_data:
     driver: local
-    name: tradingagents_mongodb_data
+    name: tradingagents_timescaledb_data
+  qdrant_data:
+    driver: local
+    name: tradingagents_qdrant_data
   redis_data:
     driver: local
     name: tradingagents_redis_data
+  pgadmin_data:
+    driver: local
+    name: tradingagents_pgadmin_data
 
 # 网络定义
 networks:

@@ -17,9 +17,17 @@ dependencies = [
     "python-multipart>=0.0.6",
 
     # 数据库和缓存
-    "motor>=3.3.0",
-    "pymongo>=4.0.0",
+    # PostgreSQL/TimescaleDB (时序数据库)
+    "psycopg[binary]>=3.1.0",  # PostgreSQL 异步驱动
+    "asyncpg>=0.29.0",  # PostgreSQL 异步驱动（性能更好）
+    "sqlalchemy>=2.0.0",  # ORM
+    "alembic>=1.13.0",  # 数据库迁移工具
+
+    # Redis (缓存)
     "redis>=6.2.0",
+
+    # 向量数据库
+    "qdrant-client>=1.7.0",  # Qdrant 向量数据库客户端
 
     # 认证和安全
     "PyJWT>=2.0.0",
@@ -48,7 +56,6 @@ dependencies = [
 
     # AI和LLM
     "chainlit>=2.5.5",
-    "chromadb>=1.0.12",
     "dashscope>=1.20.0",
     # LangChain 1.0 核心包
     "langchain>=1.0.0",
@@ -59,6 +66,8 @@ dependencies = [
     "langchain-openai>=1.0.0",
     "langgraph>=1.0.0",
     "langchain-community>=1.0.0",  # 社区集成
+    "langchain-postgres>=0.0.6",  # PostgreSQL/TimescaleDB 集成
+    "langchain-qdrant>=0.1.0",  # Qdrant 向量存储集成
     "openai>=1.0.0,<2.0.0",
 
     # 数据处理和分析
