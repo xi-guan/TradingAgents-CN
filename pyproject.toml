@@ -50,11 +50,15 @@ dependencies = [
     "chainlit>=2.5.5",
     "chromadb>=1.0.12",
     "dashscope>=1.20.0",
-    "langchain-anthropic>=0.3.15",
-    "langchain-experimental>=0.3.4",
+    # LangChain 1.0 核心包
+    "langchain>=1.0.0",
+    "langchain-core>=1.0.0",
+    "langchain-anthropic>=1.0.0",
+    "langchain-experimental>=1.0.0",
     "langchain-google-genai>=2.1.12",  # 修复 client_options 未定义错误
-    "langchain-openai>=0.3.23",
-    "langgraph>=0.4.8",
+    "langchain-openai>=1.0.0",
+    "langgraph>=1.0.0",
+    "langchain-community>=1.0.0",  # 社区集成
     "openai>=1.0.0,<2.0.0",
 
     # 数据处理和分析
@@ -88,6 +92,8 @@ dependencies = [
 
 [project.optional-dependencies]
 qianfan = ["qianfan>=0.4.20"]
+# 向后兼容：如果需要使用旧版 LangChain API
+classic = ["langchain-classic>=1.0.0"]
 
 [project.scripts]
 tradingagents = "main:main"
