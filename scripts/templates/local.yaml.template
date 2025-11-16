@@ -1,0 +1,188 @@
+# TradingAgents-CN 本地配置模板
+# 这是配置模板文件，请勿直接编辑
+# 运行 ./scripts/setup.sh 生成 config/local.yaml
+
+# ============================================================================
+# 应用配置
+# ============================================================================
+app:
+  name: TradingAgents-CN
+  version: 1.0.0-preview
+  debug: true
+  host: 0.0.0.0
+  port: 8000
+  timezone: Asia/Shanghai
+
+# ============================================================================
+# 数据库配置
+# ============================================================================
+database:
+  # TimescaleDB (PostgreSQL)
+  timescaledb:
+    host: localhost
+    port: 5432
+    database: tradingagents
+    username: tradingagents
+    password: __POSTGRES_PASSWORD__  # 自动生成
+    min_connections: 10
+    max_connections: 100
+    ssl_mode: prefer
+
+  # Qdrant 向量数据库
+  qdrant:
+    host: localhost
+    port: 6333
+    grpc_port: 6334
+    api_key: __QDRANT_API_KEY__  # 可选，留空则不使用
+
+  # Redis 缓存
+  redis:
+    host: localhost
+    port: 6379
+    password: __REDIS_PASSWORD__  # 自动生成
+    db: 0
+    max_connections: 20
+    socket_timeout: 10
+    socket_connect_timeout: 5
+
+# ============================================================================
+# 安全配置
+# ============================================================================
+security:
+  jwt:
+    secret: __JWT_SECRET__  # 自动生成
+    algorithm: HS256
+    access_token_expire_minutes: 60
+    refresh_token_expire_days: 30
+
+  csrf:
+    secret: __CSRF_SECRET__  # 自动生成
+
+  bcrypt:
+    rounds: 12
+
+# ============================================================================
+# 数据源配置
+# ============================================================================
+data_sources:
+  tushare:
+    enabled: true
+    token: __TUSHARE_TOKEN__  # 从环境变量或用户输入获取
+    tier: standard  # free/basic/standard/premium/vip
+    rate_limit_safety_margin: 0.8
+
+  akshare:
+    enabled: true
+
+  baostock:
+    enabled: true
+
+  yfinance:
+    enabled: true
+
+# ============================================================================
+# LLM API 配置
+# ============================================================================
+llm:
+  openai:
+    api_key: __OPENAI_API_KEY__  # 从环境变量或用户输入获取
+    base_url: https://api.openai.com/v1
+    model: gpt-4
+    temperature: 0.7
+
+  anthropic:
+    api_key: __ANTHROPIC_API_KEY__  # 从环境变量或用户输入获取
+    model: claude-3-5-sonnet-20241022
+
+  google:
+    api_key: __GOOGLE_API_KEY__  # 从环境变量或用户输入获取
+    model: gemini-pro
+
+# ============================================================================
+# 日志配置
+# ============================================================================
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/tradingagents.log
+  max_size: 100m
+  max_files: 10
+
+# ============================================================================
+# 缓存配置
+# ============================================================================
+cache:
+  ttl: 3600  # 通用缓存 TTL（秒）
+  screening_ttl: 1800  # 股票筛选缓存 TTL
+  quote_ttl: 60  # 行情缓存 TTL
+
+# ============================================================================
+# 并发和限流配置
+# ============================================================================
+limits:
+  rate_limit:
+    enabled: true
+    default_limit: 100  # 每分钟请求数
+
+  concurrency:
+    user_limit: 3  # 每用户并发限制
+    global_limit: 50  # 全局并发限制
+
+  quota:
+    daily_limit: 1000  # 每日配额
+
+# ============================================================================
+# CORS 配置
+# ============================================================================
+cors:
+  allowed_origins:
+    - http://localhost:3000
+    - http://localhost:5173
+    - http://localhost:8080
+  allowed_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  allowed_headers:
+    - "*"
+  allow_credentials: true
+
+# ============================================================================
+# 文件上传配置
+# ============================================================================
+upload:
+  max_size: 10485760  # 10MB
+  upload_dir: uploads
+  allowed_extensions:
+    - .csv
+    - .xlsx
+    - .json
+
+# ============================================================================
+# 任务调度配置
+# ============================================================================
+scheduler:
+  # 股票基础信息同步
+  stock_basics_sync:
+    enabled: true
+    cron: "30 6 * * *"  # 每天 06:30
+
+  # 实时行情采集
+  quotes_ingest:
+    enabled: true
+    interval_seconds: 360  # 6 分钟
+
+  # 新闻数据同步
+  news_sync:
+    enabled: true
+    cron: "0 */2 * * *"  # 每 2 小时
+
+# ============================================================================
+# 代理配置
+# ============================================================================
+proxy:
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: "localhost,127.0.0.1,eastmoney.com,push2.eastmoney.com"
