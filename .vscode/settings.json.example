@@ -1,0 +1,111 @@
+{
+  // ============================================================================
+  // TradingAgents-CN VS Code 推荐配置
+  // 使用方法: 复制此文件为 .vscode/settings.json
+  // ============================================================================
+
+  // Python - 使用 Ruff formatter 和 linter
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
+  },
+
+  // JavaScript/TypeScript/Vue - 使用 Biome formatter 和 linter
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "quickfix.biome": "explicit"
+    }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "quickfix.biome": "explicit"
+    }
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "quickfix.biome": "explicit"
+    }
+  },
+
+  // JSON/YAML - 使用 Biome formatter
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+
+  // Markdown
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+
+  // 通用编辑器设置
+  "editor.rulers": [100],
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  // Python 特定设置
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticMode": "workspace",
+
+  // 文件关联
+  "files.associations": {
+    "*.yaml": "yaml",
+    "*.yml": "yaml",
+    ".prettierrc": "json",
+    ".eslintrc": "json"
+  },
+
+  // 排除文件和目录
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/.pytest_cache": true,
+    "**/node_modules": true,
+    "**/.vite": true
+  },
+
+  // 搜索排除
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/__pycache__": true,
+    "**/*.egg-info": true
+  },
+
+  // 推荐安装的扩展
+  "recommendations": [
+    "charliermarsh.ruff",          // Ruff (Python)
+    "biomejs.biome",               // Biome (JS/TS/Vue)
+    "ms-python.python",            // Python
+    "Vue.volar",                   // Vue Language Features
+    "dbaeumer.vscode-eslint",      // ESLint
+    "redhat.vscode-yaml",          // YAML
+    "eamodio.gitlens"              // GitLens
+  ]
+}

@@ -104,6 +104,8 @@ dependencies = [
 qianfan = ["qianfan>=0.4.20"]
 # 向后兼容：如果需要使用旧版 LangChain API
 classic = ["langchain-classic>=1.0.0"]
+# 开发工具
+dev = ["ruff>=0.8.0"]
 
 [project.scripts]
 tradingagents = "main:main"
@@ -111,3 +113,79 @@ tradingagents = "main:main"
 [tool.setuptools.packages.find]
 include = ["tradingagents*"]
 exclude = ["tests*", "docs*", "scripts*", "data*", "logs*", "reports*", "results*", "eval_results*", "upstream_contribution*"]
+
+# ==============================================================================
+# Ruff - Modern Python linter and formatter
+# ==============================================================================
+[tool.ruff]
+# 目标 Python 版本
+target-version = "py310"
+
+# 每行最大字符数
+line-length = 100
+
+# 排除的目录
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    "*.egg-info",
+    "build",
+    "dist",
+    "node_modules",
+    "frontend",
+    "data",
+    "logs",
+    "reports",
+    "results",
+    "eval_results",
+]
+
+[tool.ruff.lint]
+# 启用的规则集
+# E: pycodestyle errors
+# F: pyflakes
+# I: isort (import sorting)
+# N: pep8-naming
+# W: pycodestyle warnings
+# B: flake8-bugbear
+# C4: flake8-comprehensions
+# UP: pyupgrade
+select = ["E", "F", "I", "N", "W", "B", "C4", "UP"]
+
+# 忽略的规则
+ignore = [
+    "E501",  # 行长度由 formatter 处理
+    "B008",  # 允许在函数参数中使用函数调用（FastAPI 依赖注入需要）
+    "B904",  # 允许在 except 块中不使用 raise from
+]
+
+# 允许自动修复的规则
+fixable = ["ALL"]
+unfixable = []
+
+# 允许未使用的变量（以下划线开头）
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+# 测试文件中允许使用 assert
+"tests/**/*.py" = ["B011"]
+# 脚本文件中允许使用 print
+"scripts/**/*.py" = ["T201"]
+# __init__.py 中允许未使用的导入
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+# import 排序配置
+known-first-party = ["tradingagents", "app"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.format]
+# 格式化配置
+quote-style = "double"  # 使用双引号
+indent-style = "space"  # 使用空格缩进
+line-ending = "lf"  # 使用 LF 换行符
+skip-magic-trailing-comma = false  # 保留尾随逗号
+docstring-code-format = true  # 格式化 docstring 中的代码示例
