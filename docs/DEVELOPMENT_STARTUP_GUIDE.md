@@ -7,7 +7,7 @@
 - Python 3.10+
 - **uv** (Python 包管理器，推荐) 或 pip
 - Node.js 18+
-- **yarn** (前端包管理器，推荐) 或 pnpm/npm
+- **pnpm** (前端包管理器，推荐) 或 yarn/npm
 - **Ollama**（可选，用于本地 LLM）
 
 ### 安装工具
@@ -17,9 +17,9 @@
 curl -LsSf https://astral.sh/uv/install.sh | sh
 # 或: pip install uv
 
-# 安装 yarn (推荐用于前端)
-npm install -g yarn
-# 或使用 pnpm: npm install -g pnpm
+# 安装 pnpm (推荐用于前端，更快、更节省空间)
+npm install -g pnpm
+# 或使用 yarn: npm install -g yarn
 ```
 
 ---
@@ -143,13 +143,13 @@ uv run python -m backend.app.main
 cd TradingAgents-CN/frontend
 
 # 安装依赖（首次启动）
-yarn install
-# 或使用 pnpm: pnpm install
+pnpm install
+# 或使用 yarn: yarn install
 # 或使用 npm: npm install
 
 # 启动前端
-yarn dev
-# 或: pnpm dev / npm run dev
+pnpm dev
+# 或: yarn dev / npm run dev
 ```
 
 **访问**: http://localhost:5173
@@ -205,7 +205,7 @@ uv run python -m backend.app.main &
 sleep 5
 
 # 4. 启动前端
-cd frontend && yarn dev
+cd frontend && pnpm dev
 ```
 
 ### 使用云端 API
@@ -223,7 +223,7 @@ sleep 10
 uv run python -m backend.app.main &
 
 # 3. 启动前端
-cd frontend && yarn dev
+cd frontend && pnpm dev
 ```
 
 使用:
