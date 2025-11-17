@@ -5,8 +5,22 @@
 - macOS/Linux
 - Docker & Docker Compose
 - Python 3.10+
+- **uv** (Python 包管理器，推荐) 或 pip
 - Node.js 18+
+- **yarn** (前端包管理器，推荐) 或 pnpm/npm
 - **Ollama**（可选，用于本地 LLM）
+
+### 安装工具
+
+```bash
+# 安装 uv (推荐用于 Python 依赖管理)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# 或: pip install uv
+
+# 安装 yarn (推荐用于前端)
+npm install -g yarn
+# 或使用 pnpm: npm install -g pnpm
+```
 
 ---
 
@@ -99,12 +113,13 @@ docker-compose ps
 ```bash
 cd TradingAgents-CN
 
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
+# 使用 uv 安装依赖（推荐）
+uv sync
 
-# 安装依赖
-pip install -e .
+# 或使用 pip（备选方案）
+# python -m venv venv
+# source venv/bin/activate
+# pip install -e .
 
 # 运行数据库迁移（首次启动）
 cd backend
@@ -112,7 +127,8 @@ alembic upgrade head
 cd ..
 
 # 启动后端
-python -m backend.app.main
+uv run python -m backend.app.main
+# 或使用虚拟环境: python -m backend.app.main
 ```
 
 **访问**: http://localhost:8000/docs
@@ -127,10 +143,13 @@ python -m backend.app.main
 cd TradingAgents-CN/frontend
 
 # 安装依赖（首次启动）
-npm install
+yarn install
+# 或使用 pnpm: pnpm install
+# 或使用 npm: npm install
 
 # 启动前端
-npm run dev
+yarn dev
+# 或: pnpm dev / npm run dev
 ```
 
 **访问**: http://localhost:5173
@@ -182,12 +201,11 @@ docker-compose up -d
 sleep 10
 
 # 3. 启动后端（后台）
-source venv/bin/activate
-python -m backend.app.main &
+uv run python -m backend.app.main &
 sleep 5
 
 # 4. 启动前端
-cd frontend && npm run dev
+cd frontend && yarn dev
 ```
 
 ### 使用云端 API
@@ -202,11 +220,10 @@ docker-compose up -d
 sleep 10
 
 # 2. 启动后端（后台）
-source venv/bin/activate
-python -m backend.app.main &
+uv run python -m backend.app.main &
 
 # 3. 启动前端
-cd frontend && npm run dev
+cd frontend && yarn dev
 ```
 
 使用:
