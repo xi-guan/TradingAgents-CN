@@ -88,7 +88,7 @@ cd backend && alembic upgrade head && cd ..
 uv run python -m backend.app.main
 ```
 
-访问 API 文档：http://localhost:8000/docs
+访问 API 文档：http://localhost:8003/docs
 
 ### 步骤 5: 启动前端
 
@@ -103,7 +103,7 @@ pnpm install
 pnpm dev
 ```
 
-访问应用：http://localhost:3000
+访问应用：http://localhost:3004
 
 ---
 
@@ -111,8 +111,8 @@ pnpm dev
 
 | 服务 | 端口 | 访问地址 |
 |------|------|---------|
-| 前端 (Vue) | 3000 | http://localhost:3000 |
-| 后端 (FastAPI) | 8000 | http://localhost:8000 |
+| 前端 (Vue) | 3004 | http://localhost:3004 |
+| 后端 (FastAPI) | 8003 | http://localhost:8003 |
 | TimescaleDB | 5436 | `localhost:5436` |
 | Qdrant HTTP | 6433 | http://localhost:6433 |
 | Qdrant gRPC | 6434 | `localhost:6434` |
@@ -209,8 +209,8 @@ chmod +x start-ollama.sh  # 或 start.sh
 ### 端口被占用
 ```bash
 # 检查端口占用
-lsof -i :3000  # 前端
-lsof -i :8000  # 后端
+lsof -i :3004  # 前端
+lsof -i :8003  # 后端
 lsof -i :5436  # TimescaleDB
 lsof -i :6433  # Qdrant
 lsof -i :6383  # Redis
@@ -273,5 +273,5 @@ yarn dev      # 或 npm run dev
 ## 📚 更多文档
 
 - **详细配置**: [configuration/custom-openai-endpoint.md](configuration/custom-openai-endpoint.md)
-- **API 文档**: http://localhost:8000/docs (启动后访问)
+- **API 文档**: http://localhost:8003/docs (启动后访问)
 - **项目主页**: https://github.com/xi-guan/TradingAgents-CN
