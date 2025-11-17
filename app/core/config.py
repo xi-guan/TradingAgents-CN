@@ -1,8 +1,10 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
+from typing import List, Dict, Any
 import os
 import warnings
+from pathlib import Path
+import yaml
 
 # Legacy env var aliases (deprecated): map API_HOST/PORT/DEBUG -> HOST/PORT/DEBUG
 _LEGACY_ENV_ALIASES = {
@@ -19,6 +21,188 @@ for _legacy, _new in _LEGACY_ENV_ALIASES.items():
             stacklevel=2,
         )
 
+
+def load_yaml_config() -> Dict[str, Any]:
+    """
+    从 config/local.yaml 加载配置
+
+    Returns:
+        配置字典，如果文件不存在则返回空字典
+    """
+    # 获取项目根目录
+    project_root = Path(__file__).parent.parent.parent
+    config_file = project_root / "config" / "local.yaml"
+
+    if not config_file.exists():
+        # 配置文件不存在时，返回空字典
+        # 这允许系统使用环境变量或默认值
+        return {}
+
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+
+        # 将嵌套的YAML配置扁平化为环境变量格式
+        flat_config = _flatten_yaml_config(config)
+        return flat_config
+    except Exception as e:
+        warnings.warn(
+            f"Failed to load config/local.yaml: {e}. Using environment variables instead.",
+            stacklevel=2,
+        )
+        return {}
+
+
+def _flatten_yaml_config(data: Dict[str, Any], parent_key: str = '', sep: str = '_') -> Dict[str, Any]:
+    """
+    将嵌套的YAML配置扁平化为环境变量格式
+
+    例如:
+        {'database': {'timescaledb': {'host': 'localhost'}}}
+    转换为:
+        {'DATABASE_TIMESCALEDB_HOST': 'localhost'}
+
+    Args:
+        data: 输入配置字典
+        parent_key: 父键名
+        sep: 分隔符
+
+    Returns:
+        扁平化的配置字典
+    """
+    items = []
+    for k, v in data.items():
+        new_key = f"{parent_key}{sep}{k}".upper() if parent_key else k.upper()
+
+        if isinstance(v, dict):
+            items.extend(_flatten_yaml_config(v, new_key, sep=sep).items())
+        elif isinstance(v, list):
+            # 列表转换为逗号分隔的字符串
+            items.append((new_key, ','.join(map(str, v))))
+        elif v is not None:
+            items.append((new_key, v))
+
+    return dict(items)
+
+
+def _get_yaml_to_env_mappings() -> Dict[str, str]:
+    """
+    获取YAML配置键到环境变量名的映射
+
+    Returns:
+        映射字典 {YAML_KEY: ENV_VAR_NAME}
+    """
+    return {
+        # 应用配置
+        'APP_HOST': 'HOST',
+        'APP_PORT': 'PORT',
+        'APP_DEBUG': 'DEBUG',
+        'APP_TIMEZONE': 'TIMEZONE',
+
+        # TimescaleDB 配置
+        'DATABASE_TIMESCALEDB_HOST': 'POSTGRES_HOST',
+        'DATABASE_TIMESCALEDB_PORT': 'POSTGRES_PORT',
+        'DATABASE_TIMESCALEDB_DATABASE': 'POSTGRES_DB',
+        'DATABASE_TIMESCALEDB_USERNAME': 'POSTGRES_USER',
+        'DATABASE_TIMESCALEDB_PASSWORD': 'POSTGRES_PASSWORD',
+        'DATABASE_TIMESCALEDB_MIN_CONNECTIONS': 'POSTGRES_MIN_CONNECTIONS',
+        'DATABASE_TIMESCALEDB_MAX_CONNECTIONS': 'POSTGRES_MAX_CONNECTIONS',
+
+        # Qdrant 配置
+        'DATABASE_QDRANT_HOST': 'QDRANT_HOST',
+        'DATABASE_QDRANT_PORT': 'QDRANT_PORT',
+        'DATABASE_QDRANT_GRPC_PORT': 'QDRANT_GRPC_PORT',
+        'DATABASE_QDRANT_API_KEY': 'QDRANT_API_KEY',
+
+        # Redis 配置
+        'DATABASE_REDIS_HOST': 'REDIS_HOST',
+        'DATABASE_REDIS_PORT': 'REDIS_PORT',
+        'DATABASE_REDIS_PASSWORD': 'REDIS_PASSWORD',
+        'DATABASE_REDIS_DB': 'REDIS_DB',
+        'DATABASE_REDIS_MAX_CONNECTIONS': 'REDIS_MAX_CONNECTIONS',
+
+        # JWT 配置
+        'SECURITY_JWT_SECRET': 'JWT_SECRET',
+        'SECURITY_JWT_ALGORITHM': 'JWT_ALGORITHM',
+        'SECURITY_JWT_ACCESS_TOKEN_EXPIRE_MINUTES': 'ACCESS_TOKEN_EXPIRE_MINUTES',
+        'SECURITY_JWT_REFRESH_TOKEN_EXPIRE_DAYS': 'REFRESH_TOKEN_EXPIRE_DAYS',
+
+        # CSRF 配置
+        'SECURITY_CSRF_SECRET': 'CSRF_SECRET',
+
+        # Bcrypt 配置
+        'SECURITY_BCRYPT_ROUNDS': 'BCRYPT_ROUNDS',
+
+        # 数据源配置
+        'DATA_SOURCES_TUSHARE_TOKEN': 'TUSHARE_TOKEN',
+        'DATA_SOURCES_TUSHARE_ENABLED': 'TUSHARE_ENABLED',
+        'DATA_SOURCES_TUSHARE_TIER': 'TUSHARE_TIER',
+
+        # LLM 配置
+        'LLM_OPENAI_API_KEY': 'OPENAI_API_KEY',
+        'LLM_ANTHROPIC_API_KEY': 'ANTHROPIC_API_KEY',
+        'LLM_GOOGLE_API_KEY': 'GOOGLE_API_KEY',
+
+        # 日志配置
+        'LOGGING_LEVEL': 'LOG_LEVEL',
+        'LOGGING_FORMAT': 'LOG_FORMAT',
+        'LOGGING_FILE': 'LOG_FILE',
+
+        # 缓存配置
+        'CACHE_TTL': 'CACHE_TTL',
+        'CACHE_SCREENING_TTL': 'SCREENING_CACHE_TTL',
+
+        # 限流配置
+        'LIMITS_RATE_LIMIT_ENABLED': 'RATE_LIMIT_ENABLED',
+        'LIMITS_RATE_LIMIT_DEFAULT_LIMIT': 'DEFAULT_RATE_LIMIT',
+        'LIMITS_CONCURRENCY_USER_LIMIT': 'DEFAULT_USER_CONCURRENT_LIMIT',
+        'LIMITS_CONCURRENCY_GLOBAL_LIMIT': 'GLOBAL_CONCURRENT_LIMIT',
+        'LIMITS_QUOTA_DAILY_LIMIT': 'DEFAULT_DAILY_QUOTA',
+
+        # CORS 配置
+        'CORS_ALLOWED_ORIGINS': 'ALLOWED_ORIGINS',
+        'CORS_ALLOW_CREDENTIALS': 'ALLOW_CREDENTIALS',
+
+        # 文件上传配置
+        'UPLOAD_MAX_SIZE': 'MAX_UPLOAD_SIZE',
+        'UPLOAD_UPLOAD_DIR': 'UPLOAD_DIR',
+
+        # 代理配置
+        'PROXY_HTTP_PROXY': 'HTTP_PROXY',
+        'PROXY_HTTPS_PROXY': 'HTTPS_PROXY',
+        'PROXY_NO_PROXY': 'NO_PROXY',
+
+        # 任务调度配置
+        'SCHEDULER_STOCK_BASICS_SYNC_ENABLED': 'SYNC_STOCK_BASICS_ENABLED',
+        'SCHEDULER_STOCK_BASICS_SYNC_CRON': 'SYNC_STOCK_BASICS_CRON',
+        'SCHEDULER_QUOTES_INGEST_ENABLED': 'QUOTES_INGEST_ENABLED',
+        'SCHEDULER_QUOTES_INGEST_INTERVAL_SECONDS': 'QUOTES_INGEST_INTERVAL_SECONDS',
+        'SCHEDULER_NEWS_SYNC_ENABLED': 'NEWS_SYNC_ENABLED',
+        'SCHEDULER_NEWS_SYNC_CRON': 'NEWS_SYNC_CRON',
+    }
+
+
+def _merge_yaml_to_env():
+    """
+    将YAML配置合并到环境变量
+    优先级: 环境变量 > YAML配置 > 默认值
+    """
+    yaml_config = load_yaml_config()
+    mappings = _get_yaml_to_env_mappings()
+
+    for yaml_key, value in yaml_config.items():
+        # 使用映射表转换键名
+        env_key = mappings.get(yaml_key, yaml_key)
+
+        # 只有当环境变量不存在时，才使用YAML配置
+        if env_key not in os.environ:
+            os.environ[env_key] = str(value)
+
+
+# 在加载Settings之前，先将YAML配置合并到环境变量
+_merge_yaml_to_env()
+
+
 class Settings(BaseSettings):
     # 基础配置
     DEBUG: bool = Field(default=True)
@@ -27,32 +211,30 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = Field(default_factory=lambda: ["*"])
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["*"])
 
-    # MongoDB配置
-    MONGODB_HOST: str = Field(default="localhost")
-    MONGODB_PORT: int = Field(default=27017)
-    MONGODB_USERNAME: str = Field(default="")
-    MONGODB_PASSWORD: str = Field(default="")
-    MONGODB_DATABASE: str = Field(default="tradingagents")
-    MONGODB_AUTH_SOURCE: str = Field(default="admin")
-    MONGO_MAX_CONNECTIONS: int = Field(default=100)
-    MONGO_MIN_CONNECTIONS: int = Field(default=10)
-    # MongoDB超时参数（毫秒）- 用于处理大量历史数据
-    MONGO_CONNECT_TIMEOUT_MS: int = Field(default=30000)  # 连接超时：30秒（原为10秒）
-    MONGO_SOCKET_TIMEOUT_MS: int = Field(default=60000)   # 套接字超时：60秒（原为20秒）
-    MONGO_SERVER_SELECTION_TIMEOUT_MS: int = Field(default=5000)  # 服务器选择超时：5秒
+    # PostgreSQL/TimescaleDB 配置
+    POSTGRES_HOST: str = Field(default="localhost")
+    POSTGRES_PORT: int = Field(default=5432)
+    POSTGRES_USER: str = Field(default="tradingagents")
+    POSTGRES_PASSWORD: str = Field(default="your_password_here")
+    POSTGRES_DB: str = Field(default="tradingagents")
+    POSTGRES_MAX_CONNECTIONS: int = Field(default=100)
+    POSTGRES_MIN_CONNECTIONS: int = Field(default=10)
 
     @property
-    def MONGO_URI(self) -> str:
-        """构建MongoDB URI"""
-        if self.MONGODB_USERNAME and self.MONGODB_PASSWORD:
-            return f"mongodb://{self.MONGODB_USERNAME}:{self.MONGODB_PASSWORD}@{self.MONGODB_HOST}:{self.MONGODB_PORT}/{self.MONGODB_DATABASE}?authSource={self.MONGODB_AUTH_SOURCE}"
-        else:
-            return f"mongodb://{self.MONGODB_HOST}:{self.MONGODB_PORT}/{self.MONGODB_DATABASE}"
+    def POSTGRES_URI(self) -> str:
+        """构建 PostgreSQL URI"""
+        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     @property
-    def MONGO_DB(self) -> str:
-        """获取数据库名称"""
-        return self.MONGODB_DATABASE
+    def POSTGRES_ASYNC_URI(self) -> str:
+        """构建 PostgreSQL 异步 URI (asyncpg)"""
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+
+    # Qdrant 向量数据库配置
+    QDRANT_HOST: str = Field(default="localhost")
+    QDRANT_PORT: int = Field(default=6333)
+    QDRANT_API_KEY: str = Field(default="")  # 如果使用 Qdrant Cloud，需要设置
+    QDRANT_GRPC_PORT: int = Field(default=6334)  # gRPC 端口（可选）
 
     # Redis配置
     REDIS_HOST: str = Field(default="localhost")
