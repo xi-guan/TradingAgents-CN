@@ -5,54 +5,29 @@
 - macOS/Linux
 - Docker & Docker Compose
 - Python 3.10+
-- **uv** (Python 包管理器，推荐) 或 pip
+- **uv** (Python 包管理器)
 - Node.js 18+
-- **pnpm** (前端包管理器，推荐) 或 yarn/npm
-- **Ollama**（可选，用于本地 LLM）
+- **pnpm** (前端包管理器)
 
-### 安装工具
+### 安装必要工具
 
 ```bash
-# 安装 uv (推荐用于 Python 依赖管理)
+# 安装 uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-# 或: pip install uv
 
-# 安装 pnpm (推荐用于前端，更快、更节省空间)
+# 安装 pnpm
 npm install -g pnpm
-# 或使用 yarn: npm install -g yarn
+
+# 安装 Ollama（可选，用于本地 LLM）
+brew install ollama  # macOS
+# 或访问 https://ollama.com 下载
 ```
 
 ---
 
-## 步骤 0: 启动本地 LLM（可选）
+## 快速启动步骤
 
-### 使用 Ollama（推荐本地开发）
-
-```bash
-# 安装 Ollama (macOS)
-brew install ollama
-
-# 或访问 https://ollama.com 下载安装
-
-# 启动 Ollama 服务
-ollama serve
-
-# 下载模型（新终端）
-ollama pull qwen2.5:7b          # 推荐：通义千问 7B
-# 或
-ollama pull llama3.1:8b         # Meta Llama 3.1 8B
-# 或
-ollama pull deepseek-r1:7b      # DeepSeek R1 7B
-```
-
-**优势**:
-- ✅ 完全免费，无需 API Key
-- ✅ 数据隐私，本地运行
-- ✅ 无网络限制
-
----
-
-## 步骤 1: 启动数据库服务
+### 步骤 1: 克隆项目并配置
 
 ```bash
 # 克隆项目
@@ -63,170 +38,152 @@ cd TradingAgents-CN
 cp .env.example .env
 ```
 
-### 配置 LLM（二选一，**只需修改 .env 文件，无需改代码**）
+### 步骤 2: 配置 LLM
 
-**选项 A: 使用 Ollama（本地，推荐）**
+编辑 `.env` 文件，选择以下**任一方式**：
 
-编辑 `.env` 文件，找到以下部分并取消注释：
+**方式 A: 本地 Ollama（推荐开发）**
 ```bash
-# 找到这两行（约在第 207-208 行）：
-#CUSTOM_OPENAI_API_KEY=ollama
-#CUSTOM_OPENAI_BASE_URL=http://localhost:11434/v1
-
-# 去掉前面的 # 号：
+# 取消注释（约第 207-208 行）
 CUSTOM_OPENAI_API_KEY=ollama
 CUSTOM_OPENAI_BASE_URL=http://localhost:11434/v1
 ```
 
-**选项 B: 使用云端 API**
-
-编辑 `.env` 文件，配置以下任一 API Key：
+然后启动 Ollama 并下载模型：
 ```bash
-# DeepSeek（推荐，性价比高）
-DEEPSEEK_API_KEY=sk-your-key-here
+ollama serve
+ollama pull qwen2.5:7b  # 新终端
+```
 
-# 或通义千问
+**方式 B: 云端 API**
+```bash
+# 配置任一 API Key
+DEEPSEEK_API_KEY=sk-your-key-here
+# 或
 DASHSCOPE_API_KEY=sk-your-key-here
 ```
 
-### 启动数据库
+### 步骤 3: 启动数据库
 
 ```bash
-# 启动 Docker 服务
 docker-compose up -d
-
-# 验证服务状态
-docker-compose ps
+docker-compose ps  # 验证服务
 ```
 
-**启动的服务**:
-- TimescaleDB: `localhost:5436`
-- Qdrant: `localhost:6433`
-- Redis: `localhost:6383`
+启动的服务：TimescaleDB (5436), Qdrant (6433), Redis (6383)
 
----
+### 步骤 4: 启动后端
 
-## 步骤 2: 启动后端服务
-
-**新终端窗口**:
-
+**新终端窗口：**
 ```bash
 cd TradingAgents-CN
 
-# 使用 uv 安装依赖（推荐）
+# 安装依赖（首次）
 uv sync
 
-# 或使用 pip（备选方案）
-# python -m venv venv
-# source venv/bin/activate
-# pip install -e .
+# 运行迁移（首次）
+cd backend && alembic upgrade head && cd ..
 
-# 运行数据库迁移（首次启动）
-cd backend
-alembic upgrade head
-cd ..
-
-# 启动后端
+# 启动服务
 uv run python -m backend.app.main
-# 或使用虚拟环境: python -m backend.app.main
 ```
 
-**访问**: http://localhost:8000/docs
+访问 API 文档：http://localhost:8000/docs
 
----
+### 步骤 5: 启动前端
 
-## 步骤 3: 启动前端服务
-
-**新终端窗口**:
-
+**新终端窗口：**
 ```bash
 cd TradingAgents-CN/frontend
 
-# 安装依赖（首次启动）
+# 安装依赖（首次）
 pnpm install
-# 或使用 yarn: yarn install
-# 或使用 npm: npm install
 
-# 启动前端
+# 启动服务
 pnpm dev
-# 或: yarn dev / npm run dev
 ```
 
-**访问**: http://localhost:5173
+访问应用：http://localhost:5173
+
+---
+
+## Web UI 配置（使用 Ollama 时）
+
+如果使用本地 Ollama，登录后需在 Web UI 中配置：
+
+1. 进入 **设置** → **LLM 配置**
+2. 选择 **🔧 自定义 OpenAI 端点**
+3. 填写：
+   - API 端点: `http://localhost:11434/v1`
+   - API 密钥: `ollama`
+   - 模型: `qwen2.5:7b`
+4. 保存并开始分析
 
 ---
 
 ## 停止服务
 
 ```bash
-# 停止前端/后端: Ctrl+C
+# 停止前端/后端：在对应终端按 Ctrl+C
 
-# 停止 Docker 服务
+# 停止数据库
 docker-compose down
+
+# 停止 Ollama（如使用）
+pkill ollama
 ```
 
 ---
 
-## Web UI 中使用 Ollama
-
-启动前端后（http://localhost:5173）：
-
-1. **登录/注册**账号
-2. 进入 **设置** → **LLM 配置**
-3. 选择 **🔧 自定义 OpenAI 端点**
-4. 配置：
-   - **API 端点**: `http://localhost:11434/v1`
-   - **API 密钥**: `ollama`（任意值）
-   - **模型**: 选择您已下载的模型（如 `qwen2.5:7b`）
-5. 保存配置
-6. 开始分析股票
-
----
-
-## 快速启动脚本
+## 一键启动脚本（可选）
 
 ### 使用 Ollama
 
-创建 `start-ollama.sh`:
-
+创建 `start-ollama.sh`：
 ```bash
 #!/bin/bash
+set -e
 
-# 1. 启动 Ollama（后台）
+echo "🚀 启动 TradingAgents-CN (Ollama)"
+
+# 启动 Ollama
 ollama serve &
 sleep 5
 
-# 2. 启动数据库
+# 启动数据库
 docker-compose up -d
 sleep 10
 
-# 3. 启动后端（后台）
+# 启动后端
 uv run python -m backend.app.main &
 sleep 5
 
-# 4. 启动前端
+# 启动前端
 cd frontend && pnpm dev
 ```
 
 ### 使用云端 API
 
-创建 `start.sh`:
-
+创建 `start.sh`：
 ```bash
 #!/bin/bash
+set -e
 
-# 1. 启动数据库
+echo "🚀 启动 TradingAgents-CN"
+
+# 启动数据库
 docker-compose up -d
 sleep 10
 
-# 2. 启动后端（后台）
+# 启动后端
 uv run python -m backend.app.main &
+sleep 5
 
-# 3. 启动前端
+# 启动前端
 cd frontend && pnpm dev
 ```
 
-使用:
+**使用：**
 ```bash
 chmod +x start-ollama.sh  # 或 start.sh
 ./start-ollama.sh         # 或 ./start.sh
@@ -234,8 +191,72 @@ chmod +x start-ollama.sh  # 或 start.sh
 
 ---
 
-## 📚 更多信息
+## 常见问题
 
-- **Ollama 配置详情**: [docs/configuration/custom-openai-endpoint.md](configuration/custom-openai-endpoint.md)
-- **支持的模型**: https://ollama.com/library
+### 端口被占用
+```bash
+# 检查端口占用
+lsof -i :5173  # 前端
+lsof -i :8000  # 后端
+lsof -i :5436  # 数据库
+```
+
+### 依赖安装失败
+```bash
+# 清理缓存
+uv cache clean          # 后端
+pnpm store prune        # 前端
+
+# 重新安装
+uv sync
+cd frontend && pnpm install
+```
+
+### 数据库连接失败
+```bash
+# 查看日志
+docker-compose logs timescaledb
+docker-compose logs redis
+
+# 重启服务
+docker-compose restart
+```
+
+---
+
+## 推荐模型（Ollama）
+
+| 模型 | 大小 | 特点 | 命令 |
+|------|------|------|------|
+| qwen2.5:7b | ~4.7GB | 中文好，推荐 | `ollama pull qwen2.5:7b` |
+| llama3.1:8b | ~4.7GB | 通用，英文好 | `ollama pull llama3.1:8b` |
+| deepseek-r1:7b | ~4.1GB | 推理能力强 | `ollama pull deepseek-r1:7b` |
+
+更多模型：https://ollama.com/library
+
+---
+
+## 备选方案
+
+### 不使用 uv
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -e .
+python -m backend.app.main
+```
+
+### 不使用 pnpm
+```bash
+cd frontend
+yarn install  # 或 npm install
+yarn dev      # 或 npm run dev
+```
+
+---
+
+## 📚 更多文档
+
+- **详细配置**: [configuration/custom-openai-endpoint.md](configuration/custom-openai-endpoint.md)
+- **API 文档**: http://localhost:8000/docs (启动后访问)
 - **项目主页**: https://github.com/xi-guan/TradingAgents-CN
