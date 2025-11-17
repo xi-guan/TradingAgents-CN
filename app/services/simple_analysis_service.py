@@ -598,14 +598,9 @@ class SimpleAnalysisService:
         # 进度跟踪器缓存
         self._progress_trackers: Dict[str, RedisProgressTracker] = {}
 
-        # 🔧 创建共享的线程池，支持并发执行多个分析任务
-        # 默认最多同时执行3个分析任务（可根据服务器资源调整）
-        import concurrent.futures
-        self._thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)
-
         logger.info(f"🔧 [服务初始化] SimpleAnalysisService 实例ID: {id(self)}")
         logger.info(f"🔧 [服务初始化] 内存管理器实例ID: {id(self.memory_manager)}")
-        logger.info(f"🔧 [服务初始化] 线程池最大并发数: 3")
+        logger.info(f"🔧 [服务初始化] 使用 asyncio.to_thread() 进行异步化（使用默认线程池）")
 
         # 设置 WebSocket 管理器
         # 简单的股票名称缓存，减少重复查询
@@ -1067,20 +1062,19 @@ class SimpleAnalysisService:
         request: SingleAnalysisRequest,
         progress_tracker: Optional[RedisProgressTracker] = None
     ) -> Dict[str, Any]:
-        """同步执行分析（在共享线程池中运行）"""
-        # 🔧 使用共享线程池，支持多个任务并发执行
-        # 不再每次创建新的线程池，避免串行执行
-        loop = asyncio.get_event_loop()
-        logger.info(f"🚀 [线程池] 提交分析任务到共享线程池: {task_id} - {request.stock_code}")
-        result = await loop.run_in_executor(
-            self._thread_pool,  # 使用共享线程池
+        """异步执行分析（使用 asyncio.to_thread）"""
+        # 🔧 使用 asyncio.to_thread() 在单独的线程中执行分析
+        # 这比手动管理线程池更高效，因为它使用 Python 的默认线程池
+        # 并且避免了创建和销毁线程池的开销
+        logger.info(f"🚀 [异步执行] 提交分析任务: {task_id} - {request.stock_code}")
+        result = await asyncio.to_thread(
             self._run_analysis_sync,
             task_id,
             user_id,
             request,
             progress_tracker
         )
-        logger.info(f"✅ [线程池] 分析任务执行完成: {task_id}")
+        logger.info(f"✅ [异步执行] 分析任务完成: {task_id}")
         return result
 
     def _run_analysis_sync(

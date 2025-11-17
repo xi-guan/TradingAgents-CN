@@ -366,20 +366,13 @@ class AnalysisService:
             progress_tracker.update_progress("🚀 开始股票分析")
             await self._update_task_status_with_tracker(task.task_id, AnalysisStatus.PROCESSING, progress_tracker)
 
-            # 在线程池中执行分析，避免阻塞事件循环
-            import asyncio
-            import concurrent.futures
-
-            loop = asyncio.get_event_loop()
-
-            # 使用线程池执行器运行同步的分析代码
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                result = await loop.run_in_executor(
-                    executor,
-                    self._execute_analysis_sync_with_progress,
-                    task,
-                    progress_tracker
-                )
+            # 使用 asyncio.to_thread() 在单独的线程中执行分析，避免阻塞事件循环
+            # 这比 ThreadPoolExecutor 更高效，因为它使用默认的线程池并避免额外的开销
+            result = await asyncio.to_thread(
+                self._execute_analysis_sync_with_progress,
+                task,
+                progress_tracker
+            )
 
             # 标记完成
             progress_tracker.mark_completed("✅ 分析完成")

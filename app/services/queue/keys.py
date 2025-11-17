@@ -17,8 +17,8 @@ USER_PROCESSING_PREFIX = "qa:user_processing:"
 GLOBAL_CONCURRENT_KEY = "qa:global_concurrent"
 VISIBILITY_TIMEOUT_PREFIX = "qa:visibility:"
 
-# 配置常量 - 开源版限制
-DEFAULT_USER_CONCURRENT_LIMIT = 3
-GLOBAL_CONCURRENT_LIMIT = 3  # 开源版全局最大并发限制为3
+# 配置常量 - 性能优化后的并发限制
+DEFAULT_USER_CONCURRENT_LIMIT = 10  # 每用户最多10个并发任务
+GLOBAL_CONCURRENT_LIMIT = 200  # 全局最多200个并发任务（优化后）
 VISIBILITY_TIMEOUT_SECONDS = 300  # 5分钟
 

@@ -241,7 +241,7 @@ class Settings(BaseSettings):
     REDIS_PORT: int = Field(default=6379)
     REDIS_PASSWORD: str = Field(default="")
     REDIS_DB: int = Field(default=0)
-    REDIS_MAX_CONNECTIONS: int = Field(default=20)
+    REDIS_MAX_CONNECTIONS: int = Field(default=100)  # 优化：增加连接池以支持更高并发
     REDIS_RETRY_ON_TIMEOUT: bool = Field(default=True)
 
     @property
