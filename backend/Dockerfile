@@ -69,7 +69,7 @@ RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple && \
     pip install --prefer-binary pdfkit -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 复制后端代码和必需模块
-COPY app ./app
+COPY backend/app ./app
 COPY tradingagents ./tradingagents
 COPY config ./config
 COPY scripts ./scripts

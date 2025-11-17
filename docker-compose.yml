@@ -7,10 +7,11 @@ services:
   # TimescaleDB 时序数据库服务
   timescaledb:
     image: timescale/timescaledb:latest-pg16
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-timescaledb
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5436:5432"
     environment:
       POSTGRES_USER: tradingagents
       POSTGRES_PASSWORD: tradingagents123
@@ -42,11 +43,12 @@ services:
   # Qdrant 向量数据库服务
   qdrant:
     image: qdrant/qdrant:latest
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-qdrant
     restart: unless-stopped
     ports:
-      - "6333:6333"  # HTTP API
-      - "6334:6334"  # gRPC
+      - "6433:6333"  # HTTP API
+      - "6434:6334"  # gRPC
     environment:
       QDRANT__LOG_LEVEL: INFO
       TZ: "Asia/Shanghai"
@@ -69,10 +71,11 @@ services:
   # Redis 缓存服务
   redis:
     image: redis:7-alpine
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6383:6379"
     environment:
       TZ: "Asia/Shanghai"
     command: redis-server --appendonly yes --requirepass tradingagents123
