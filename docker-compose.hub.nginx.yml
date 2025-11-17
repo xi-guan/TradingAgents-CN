@@ -67,7 +67,7 @@ services:
     # 拉取镜像: docker-compose -f docker-compose.hub.nginx.yml pull backend
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: backend/Dockerfile
     image: hsliup/tradingagents-backend:latest
     container_name: tradingagents-backend
     restart: unless-stopped

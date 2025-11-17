@@ -7,6 +7,7 @@ services:
   # TimescaleDB 时序数据库服务
   timescaledb:
     image: timescale/timescaledb:latest-pg16
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-timescaledb
     restart: unless-stopped
     ports:
@@ -42,6 +43,7 @@ services:
   # Qdrant 向量数据库服务
   qdrant:
     image: qdrant/qdrant:latest
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-qdrant
     restart: unless-stopped
     ports:
@@ -69,6 +71,7 @@ services:
   # Redis 缓存服务
   redis:
     image: redis:7-alpine
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
     container_name: tradingagents-redis
     restart: unless-stopped
     ports:
