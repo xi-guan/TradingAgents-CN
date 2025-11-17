@@ -49,20 +49,29 @@ cd TradingAgents-CN
 cp .env.example .env
 ```
 
-### 配置 LLM（二选一）
+### 配置 LLM（二选一，**只需修改 .env 文件，无需改代码**）
 
-**选项 A: 使用 Ollama（本地）**
+**选项 A: 使用 Ollama（本地，推荐）**
+
+编辑 `.env` 文件，找到以下部分并取消注释：
 ```bash
-# 编辑 .env 文件，添加：
+# 找到这两行（约在第 207-208 行）：
+#CUSTOM_OPENAI_API_KEY=ollama
+#CUSTOM_OPENAI_BASE_URL=http://localhost:11434/v1
+
+# 去掉前面的 # 号：
 CUSTOM_OPENAI_API_KEY=ollama
 CUSTOM_OPENAI_BASE_URL=http://localhost:11434/v1
 ```
 
 **选项 B: 使用云端 API**
+
+编辑 `.env` 文件，配置以下任一 API Key：
 ```bash
-# 编辑 .env，配置以下任一 API Key：
+# DeepSeek（推荐，性价比高）
 DEEPSEEK_API_KEY=sk-your-key-here
-# 或
+
+# 或通义千问
 DASHSCOPE_API_KEY=sk-your-key-here
 ```
 
