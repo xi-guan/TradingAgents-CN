@@ -103,7 +103,20 @@ pnpm install
 pnpm dev
 ```
 
-访问应用：http://localhost:5173
+访问应用：http://localhost:3000
+
+---
+
+## 端口总览
+
+| 服务 | 端口 | 访问地址 |
+|------|------|---------|
+| 前端 (Vue) | 3000 | http://localhost:3000 |
+| 后端 (FastAPI) | 8000 | http://localhost:8000 |
+| TimescaleDB | 5436 | `localhost:5436` |
+| Qdrant HTTP | 6433 | http://localhost:6433 |
+| Qdrant gRPC | 6434 | `localhost:6434` |
+| Redis | 6383 | `localhost:6383` |
 
 ---
 
@@ -196,9 +209,11 @@ chmod +x start-ollama.sh  # 或 start.sh
 ### 端口被占用
 ```bash
 # 检查端口占用
-lsof -i :5173  # 前端
+lsof -i :3000  # 前端
 lsof -i :8000  # 后端
-lsof -i :5436  # 数据库
+lsof -i :5436  # TimescaleDB
+lsof -i :6433  # Qdrant
+lsof -i :6383  # Redis
 ```
 
 ### 依赖安装失败
