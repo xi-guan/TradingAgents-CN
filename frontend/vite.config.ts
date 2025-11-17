@@ -41,7 +41,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: 3004,
     hmr: {
       overlay: false
     },
@@ -51,7 +51,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8003',
         changeOrigin: true,
         secure: false,
         ws: true  // 🔥 启用 WebSocket 代理支持
