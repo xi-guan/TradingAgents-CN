@@ -30,7 +30,8 @@ def load_yaml_config() -> Dict[str, Any]:
         配置字典，如果文件不存在则返回空字典
     """
     # 获取项目根目录
-    project_root = Path(__file__).parent.parent.parent
+    # 从 backend/app/core/config.py 向上4层到达项目根目录
+    project_root = Path(__file__).parent.parent.parent.parent
     config_file = project_root / "config" / "local.yaml"
 
     if not config_file.exists():
