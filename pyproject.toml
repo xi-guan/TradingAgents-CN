@@ -7,7 +7,7 @@ name = "tradingagents"
 version = "1.0.0-preview"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     # 后端API框架和服务器
     "fastapi>=0.104.0",
@@ -57,15 +57,15 @@ dependencies = [
     # AI和LLM
     "chainlit>=2.5.5",
     "dashscope>=1.20.0",
-    # LangChain 1.0 核心包
-    "langchain>=1.0.0",
-    "langchain-core>=1.0.0",
-    "langchain-anthropic>=1.0.0",
-    "langchain-experimental>=1.0.0",
+    # LangChain 0.3 核心包
+    "langchain>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-anthropic>=0.3.0",
+    "langchain-experimental>=0.3.0",
     "langchain-google-genai>=2.1.12",  # 修复 client_options 未定义错误
-    "langchain-openai>=1.0.0",
-    "langgraph>=1.0.0",
-    "langchain-community>=1.0.0",  # 社区集成
+    "langchain-openai>=0.3.0",
+    "langgraph>=0.4.0",
+    "langchain-community>=0.3.0",  # 社区集成
     "langchain-postgres>=0.0.6",  # PostgreSQL/TimescaleDB 集成
     "langchain-qdrant>=0.1.0",  # Qdrant 向量存储集成
     "openai>=1.0.0,<2.0.0",
@@ -101,9 +101,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-qianfan = ["qianfan>=0.4.20"]
+qianfan = ["qianfan>=0.4.0"]
 # 向后兼容：如果需要使用旧版 LangChain API
-classic = ["langchain-classic>=1.0.0"]
+classic = ["langchain-classic>=0.3.0"]
 # 开发工具
 dev = ["ruff>=0.8.0"]
 
