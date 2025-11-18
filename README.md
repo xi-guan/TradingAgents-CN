@@ -148,13 +148,28 @@ You'll need API keys for:
 
 ```
 TradingAgents-CN/
-├── app/                    # FastAPI backend
+├── backend/                # FastAPI backend
 ├── frontend/               # Vue 3 frontend
 ├── tradingagents/          # Core multi-agent library
-├── web/                    # Streamlit app (legacy)
-├── scripts/                # Utility scripts
+├── docker/                 # Docker configurations
+│   ├── docker-compose.yml
+│   ├── Dockerfile.frontend
+│   ├── nginx-frontend.conf
+│   └── nginx-gateway.conf
 ├── docs/                   # Documentation
-└── docker-compose.yml      # Docker services
+│   ├── deployment/        # Installation & deployment configs
+│   └── examples/          # Code examples
+├── tests/                  # Test suite
+├── scripts/                # Utility scripts
+├── tools/                  # CLI tools
+│   └── cli/               # Data initialization CLI
+├── legacy/                 # Legacy code
+│   └── web/               # Streamlit app (deprecated)
+├── assets/                 # Static assets & images
+├── config/                 # Global configuration
+├── data/                   # Runtime data
+├── database/               # Database files
+└── reports/                # Generated reports
 ```
 
 ### Running Tests
