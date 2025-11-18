@@ -5,6 +5,14 @@ Alembic 环境配置
 
 from logging.config import fileConfig
 import asyncio
+import sys
+from pathlib import Path
+
+# 添加 backend 目录到 Python 路径
+# 这样无论从哪里运行 alembic 都能正确导入 app 模块
+backend_dir = Path(__file__).parent.parent.resolve()
+if str(backend_dir) not in sys.path:
+    sys.path.insert(0, str(backend_dir))
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
