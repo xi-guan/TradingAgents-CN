@@ -29,13 +29,13 @@ cd TradingAgents-CN
 2. **Configure environment**
 ```bash
 cp .env.example .env
-# Edit .env and configure your settings (MongoDB, Redis, API keys)
+# Edit .env and configure your settings (TimescaleDB, Qdrant, Redis, API keys)
 ```
 
 3. **Start databases (Docker)**
 ```bash
-# Start MongoDB and Redis
-docker compose -f docker/docker-compose.hub.nginx.yml up -d mongodb redis
+# Start TimescaleDB, Qdrant, and Redis
+docker compose -f docker/docker-compose.yml up -d
 ```
 
 ### Running the Application
@@ -79,7 +79,8 @@ The frontend will be available at http://localhost:5173
 ### Backend
 - **FastAPI** - Modern async Python web framework
 - **Python 3.10+** - Core language
-- **MongoDB** - Primary database for stock data and analysis
+- **TimescaleDB** - Time-series database (PostgreSQL extension) for stock data
+- **Qdrant** - Vector database for embeddings and semantic search
 - **Redis** - Caching and session management
 - **uv** - Fast Python package manager
 
@@ -210,8 +211,9 @@ DOCKER_PLATFORM=linux/arm64  # for Apple Silicon
 
 ### Services
 
-- **MongoDB**: Port 27017
-- **Redis**: Port 6379
+- **TimescaleDB**: Port 5436 (mapped from container port 5432)
+- **Qdrant**: Port 6433 (HTTP API), Port 6434 (gRPC)
+- **Redis**: Port 6383 (mapped from container port 6379)
 
 ---
 
