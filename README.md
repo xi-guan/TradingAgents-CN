@@ -152,25 +152,17 @@ TradingAgents-CN/
 ├── frontend/               # Vue 3 frontend
 ├── tradingagents/          # Core multi-agent library
 ├── docker/                 # Docker configurations
-│   ├── docker-compose.yml
-│   ├── Dockerfile.frontend
-│   ├── nginx-frontend.conf
-│   └── nginx-gateway.conf
-├── docs/                   # Documentation
-│   ├── deployment/        # Installation & deployment configs
-│   └── examples/          # Code examples
+├── docs/                   # Documentation & examples
 ├── tests/                  # Test suite
-├── scripts/                # Utility scripts
-├── tools/                  # CLI tools
-│   └── cli/               # Data initialization CLI
-├── legacy/                 # Legacy code
-│   └── web/               # Streamlit app (deprecated)
+├── scripts/                # Utility scripts & CLI tools
 ├── assets/                 # Static assets & images
-├── config/                 # Global configuration
-├── data/                   # Runtime data
-├── database/               # Database files
-└── reports/                # Generated reports
+└── config/                 # Logging configuration
 ```
+
+**Runtime directories** (not in version control):
+- `data/` - Analysis results and runtime data
+- `database/` - Database files
+- `reports/` - Generated reports
 
 ### Running Tests
 
