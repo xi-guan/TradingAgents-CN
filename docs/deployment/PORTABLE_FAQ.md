@@ -16,7 +16,7 @@ powershell -ExecutionPolicy Bypass -File scripts\deployment\sync_and_build_only.
 
 **功能**：
 - ✅ 同步所有代码文件到 `release/TradingAgentsCN-portable`
-- ✅ 构建前端（yarn install + yarn vite build）
+- ✅ 构建前端（pnpm install + pnpm vite build）
 - ✅ 复制前端 dist 到绿色版目录
 - ❌ **不打包** ZIP 文件
 
