@@ -237,9 +237,9 @@ powershell -ExecutionPolicy Bypass -File scripts\deployment\build_portable_packa
 ### 提示 1：加速前端构建
 
 ```powershell
-# 使用 Yarn 缓存
+# 使用 pnpm
 cd frontend
-yarn install --frozen-lockfile --prefer-offline
+pnpm install --frozen-lockfile --prefer-offline
 ```
 
 ---

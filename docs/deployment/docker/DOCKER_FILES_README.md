@@ -110,7 +110,7 @@ docker run -d \
 - **运行镜像**: `nginx:alpine`
 - **工作目录**: `/usr/share/nginx/html`
 - **暴露端口**: `80`（映射到主机5173）
-- **包管理器**: `yarn 1.22.22`（必需）
+- **包管理器**: `pnpm`
 
 ### 多阶段构建
 
@@ -118,9 +118,9 @@ docker run -d \
 
 ```dockerfile
 FROM node:22-alpine AS build
-- 使用yarn安装依赖
-- 使用vite构建生产版本
-- 生成dist目录
+- 使用 pnpm 安装依赖
+- 使用 vite 构建生产版本
+- 生成 dist 目录
 ```
 
 #### 阶段2：运行（runtime）
@@ -325,10 +325,10 @@ docker-compose -f docker-compose.v1.0.0.yml restart backend
 
 **解决方案**:
 ```bash
-# 1. 检查yarn.lock是否存在
-ls frontend/yarn.lock
+# 1. 检查 pnpm-lock.yaml 是否存在
+ls frontend/pnpm-lock.yaml
 
-# 2. 清理node_modules后重新构建
+# 2. 清理 node_modules 后重新构建
 rm -rf frontend/node_modules
 docker-compose -f docker-compose.v1.0.0.yml build --no-cache frontend
 

@@ -13,67 +13,64 @@ A forked and enhanced version of [TradingAgents-CN](https://github.com/hsliuping
 
 ### Prerequisites
 
-- macOS or Linux (**Windows not supported**)
-- Docker and Docker Compose
-- Python 3.10+ (for source installation)
+- Python 3.10+
+- Node.js 18+
+- **uv** (Python package manager) - [Installation](https://docs.astral.sh/uv/)
+- **pnpm** (Frontend package manager) - Install via `npm install -g pnpm`
 
-### Docker Installation (Recommended)
+### Installation
 
-1. Clone the repository:
+1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/TradingAgents-CN
+git clone https://github.com/xi-guan/TradingAgents-CN
 cd TradingAgents-CN
 ```
 
-2. Copy and configure environment variables:
+2. **Configure environment**
 ```bash
 cp .env.example .env
-# Edit .env and add your API keys
+# Edit .env and configure your settings (TimescaleDB, Qdrant, Redis, API keys)
 ```
 
-3. Start services:
+3. **Start databases (Docker)**
 ```bash
-docker-compose up -d
+# Start TimescaleDB, Qdrant, and Redis
+docker compose -f docker/docker-compose.yml up -d
 ```
 
-4. Access the application:
-- Web UI: http://localhost:8080
+### Running the Application
+
+#### Backend
+
+```bash
+# Install dependencies with uv
+uv sync
+
+# Run database migrations
+cd backend
+uv run alembic upgrade head
+
+# Start backend server
+cd ..
+uv run python -m backend.app
+```
+
+The backend API will be available at:
 - API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
 
-### Source Installation
+#### Frontend
 
-1. Create virtual environment:
 ```bash
-python -m venv venv
-source venv/bin/activate  # macOS/Linux only
-```
-
-2. Install dependencies:
-```bash
-pip install -e .
-```
-
-3. Configure environment:
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
-
-4. Start databases:
-```bash
-docker-compose up -d
-```
-
-5. Run the application:
-```bash
-# Backend
-python -m app.main
-
-# Frontend (in another terminal)
+# Install dependencies
 cd frontend
-npm install
-npm run dev
+pnpm install
+
+# Start development server
+pnpm dev
 ```
+
+The frontend will be available at http://localhost:5173
 
 ---
 
@@ -82,15 +79,17 @@ npm run dev
 ### Backend
 - **FastAPI** - Modern async Python web framework
 - **Python 3.10+** - Core language
-- **TimescaleDB** - Time-series database (PostgreSQL extension)
-- **Qdrant** - Vector database for embeddings
+- **TimescaleDB** - Time-series database (PostgreSQL extension) for stock data
+- **Qdrant** - Vector database for embeddings and semantic search
 - **Redis** - Caching and session management
+- **uv** - Fast Python package manager
 
 ### Frontend
 - **Vue 3** - Progressive JavaScript framework
 - **TypeScript** - Type-safe JavaScript
 - **Vite** - Next-generation frontend tooling
 - **Element Plus** - UI component library
+- **pnpm** - Fast, disk space efficient package manager
 
 ### Core Library
 - **LangGraph** - Multi-agent orchestration
@@ -167,18 +166,33 @@ TradingAgents-CN/
 ### Running Tests
 
 ```bash
-pytest tests/
+# Backend tests
+uv run pytest tests/
+
+# Frontend tests (if available)
+cd frontend
+pnpm test
 ```
 
 ### Code Style
 
-```bash
-# Format code
-black .
-isort .
+Backend uses Ruff for linting and formatting:
 
-# Type checking
-mypy .
+```bash
+# Lint code
+uv run ruff check .
+
+# Format code
+uv run ruff format .
+```
+
+Frontend uses Biome:
+
+```bash
+cd frontend
+pnpm check      # Lint and format
+pnpm format     # Format only
+pnpm lint       # Lint only
 ```
 
 ---
@@ -187,19 +201,19 @@ mypy .
 
 ### Platform Support
 
-This fork defaults to ARM64 (Apple Silicon). To change:
+Configure your platform in `.env`:
 
 ```bash
 # In .env file
 DOCKER_PLATFORM=linux/amd64  # for Intel/AMD processors
-DOCKER_PLATFORM=linux/arm64  # for Apple Silicon (default)
+DOCKER_PLATFORM=linux/arm64  # for Apple Silicon
 ```
 
 ### Services
 
-- **TimescaleDB**: Port 5432
-- **Qdrant**: Port 6333 (HTTP), 6334 (gRPC)
-- **Redis**: Port 6379
+- **TimescaleDB**: Port 5436 (mapped from container port 5432)
+- **Qdrant**: Port 6433 (HTTP API), Port 6434 (gRPC)
+- **Redis**: Port 6383 (mapped from container port 6379)
 
 ---
 

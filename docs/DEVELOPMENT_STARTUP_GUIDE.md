@@ -261,13 +261,6 @@ pip install -e .
 python -m backend.app.main
 ```
 
-### 不使用 pnpm
-```bash
-cd frontend
-yarn install  # 或 npm install
-yarn dev      # 或 npm run dev
-```
-
 ---
 
 ## 📚 更多文档

@@ -444,7 +444,7 @@ def _sanitize_document(self, doc: dict) -> dict:
 **优化内容**:
 1. 构建脚本同时推送 `v1.0.0-preview` 和 `latest` 两个标签
 2. 支持通过环境变量覆盖构建平台：`PLATFORMS=linux/amd64 ./scripts/build-multiarch.sh`
-3. 添加 `.yarnrc` 配置文件，使用国内镜像源加速依赖下载
+3. 添加包管理器配置文件（`.npmrc`，原 `.yarnrc`），使用国内镜像源加速依赖下载
 4. 增加网络超时时间到 5 分钟，适应跨平台构建
 
 ---
