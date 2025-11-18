@@ -17,7 +17,6 @@ services:
   # MongoDB数据库
   mongodb:
     image: mongo:4.4
-    platform: linux/arm64  # 显式指定 ARM64 平台
     container_name: tradingagents-mongodb
     restart: unless-stopped
     ports:
@@ -43,7 +42,6 @@ services:
   # Redis缓存
   redis:
     image: redis:7-alpine
-    platform: linux/arm64  # 显式指定 ARM64 平台
     container_name: tradingagents-redis
     restart: unless-stopped
     ports:
@@ -64,18 +62,25 @@ services:
 
   # FastAPI后端服务
   backend:
-    image: hsliup/tradingagents-backend-arm64:latest
-    platform: linux/arm64  # 显式指定 ARM64 平台
+    # 支持本地构建或从Docker Hub拉取
+    # 本地构建: docker-compose -f docker-compose.hub.nginx.yml build backend
+    # 拉取镜像: docker-compose -f docker-compose.hub.nginx.yml pull backend
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    image: hsliup/tradingagents-backend:latest
     container_name: tradingagents-backend
     restart: unless-stopped
     expose:
       - "8000"
     volumes:
-      - ./logs:/app/logs
-      #- ./config:/app/config
-      - ./data:/app/data
+      - ../logs:/app/logs
+      # 不映射config目录，使用镜像内的配置文件
+      # 如需修改配置，请修改代码后重新构建镜像
+      # - ../config:/app/config
+      - ../data:/app/data
     env_file:
-      - .env
+      - ../.env
     environment:
       TZ: "Asia/Shanghai"
       TRADINGAGENTS_LOG_LEVEL: "INFO"
@@ -115,6 +120,9 @@ services:
       OPENAI_ENABLED: "${OPENAI_ENABLED:-false}"
       GOOGLE_API_KEY: "${GOOGLE_API_KEY}"
       GOOGLE_ENABLED: "${GOOGLE_ENABLED:-false}"
+      BAIDU_API_KEY: "${BAIDU_API_KEY}"
+      BAIDU_SECRET_KEY: "${BAIDU_SECRET_KEY}"
+      BAIDU_ENABLED: "${BAIDU_ENABLED:-false}"
       OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
       OPENROUTER_ENABLED: "${OPENROUTER_ENABLED:-false}"
       # 数据源API密钥
@@ -140,8 +148,11 @@ services:
 
   # Vue 3前端服务
   frontend:
-    image: hsliup/tradingagents-frontend-arm64:latest
-    platform: linux/arm64  # 显式指定 ARM64 平台
+    # 支持本地构建或从Docker Hub拉取
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    image: hsliup/tradingagents-frontend:latest
     container_name: tradingagents-frontend
     restart: unless-stopped
     expose:
@@ -162,15 +173,15 @@ services:
       start_period: 10s
 
   # Nginx 反向代理
+  # ports可以改为8080:80,或者其它的端口映射，前面一个是外部的端口，后面一个是容器内的端口
   nginx:
     image: nginx:alpine
-    platform: linux/arm64  # 显式指定 ARM64 平台
     container_name: tradingagents-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "80:80" 
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-gateway.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - frontend
       - backend

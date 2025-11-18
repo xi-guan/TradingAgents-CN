@@ -23,8 +23,8 @@ services:
       TS_TUNE_NUM_CPUS: 4
     volumes:
       - timescaledb_data:/var/lib/postgresql/data
-      - ./database/timescaledb/init.sql:/docker-entrypoint-initdb.d/01_init.sql
-      - ./database/timescaledb/schema.sql:/docker-entrypoint-initdb.d/02_schema.sql
+      - ../database/timescaledb/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ../database/timescaledb/schema.sql:/docker-entrypoint-initdb.d/02_schema.sql
     networks:
       - tradingagents-network
     healthcheck:

@@ -148,14 +148,21 @@ You'll need API keys for:
 
 ```
 TradingAgents-CN/
-├── app/                    # FastAPI backend
+├── backend/                # FastAPI backend
 ├── frontend/               # Vue 3 frontend
 ├── tradingagents/          # Core multi-agent library
-├── web/                    # Streamlit app (legacy)
-├── scripts/                # Utility scripts
-├── docs/                   # Documentation
-└── docker-compose.yml      # Docker services
+├── docker/                 # Docker configurations
+├── docs/                   # Documentation & examples
+├── tests/                  # Test suite
+├── scripts/                # Utility scripts & CLI tools
+├── assets/                 # Static assets & images
+└── config/                 # Logging configuration
 ```
+
+**Runtime directories** (not in version control):
+- `data/` - Analysis results and runtime data
+- `database/` - Database files
+- `reports/` - Generated reports
 
 ### Running Tests
 
