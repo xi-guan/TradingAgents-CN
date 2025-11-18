@@ -465,7 +465,12 @@ class Settings(BaseSettings):
         return not self.DEBUG
 
     # Ignore any extra environment variables present in .env or process env
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # 使用项目根目录的 .env 文件（从 backend/app/core/config.py 向上3层）
+    model_config = SettingsConfigDict(
+        env_file=str(Path(__file__).parent.parent.parent.parent / ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 settings = Settings()
 
