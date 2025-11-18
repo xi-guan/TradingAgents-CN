@@ -66,7 +66,7 @@ services:
     # 本地构建: docker-compose -f docker-compose.hub.nginx.yml build backend
     # 拉取镜像: docker-compose -f docker-compose.hub.nginx.yml pull backend
     build:
-      context: .
+      context: ..
       dockerfile: backend/Dockerfile
     image: hsliup/tradingagents-backend:latest
     container_name: tradingagents-backend
@@ -74,13 +74,13 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./logs:/app/logs
+      - ../logs:/app/logs
       # 不映射config目录，使用镜像内的配置文件
       # 如需修改配置，请修改代码后重新构建镜像
-      # - ./config:/app/config
-      - ./data:/app/data
+      # - ../config:/app/config
+      - ../data:/app/data
     env_file:
-      - .env
+      - ../.env
     environment:
       TZ: "Asia/Shanghai"
       TRADINGAGENTS_LOG_LEVEL: "INFO"
@@ -150,8 +150,8 @@ services:
   frontend:
     # 支持本地构建或从Docker Hub拉取
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
     image: hsliup/tradingagents-frontend:latest
     container_name: tradingagents-frontend
     restart: unless-stopped
@@ -181,7 +181,7 @@ services:
     ports:
       - "80:80" 
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-gateway.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - frontend
       - backend
